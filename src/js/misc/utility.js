@@ -35,22 +35,25 @@ function mg_jquery_exists() {
 }
 
 function mg_get_rollover_time_format(args) {
+  // custom time format
+  var ctf = args.time_format_rollover || {};
+
   var fmt;
   switch (args.processed.x_time_frame) {
     case 'millis':
-      fmt = MG.time_format(args.utc_time, '%b %e, %Y  %H:%M:%S.%L');
+      fmt = MG.time_format(args.utc_time, ctf[args.processed.x_time_frame] || '%b %e, %Y  %H:%M:%S.%L');
       break;
     case 'seconds':
-      fmt = MG.time_format(args.utc_time, '%b %e, %Y  %H:%M:%S');
+      fmt = MG.time_format(args.utc_time, ctf[args.processed.x_time_frame] || '%b %e, %Y  %H:%M:%S');
       break;
     case 'less-than-a-day':
-      fmt = MG.time_format(args.utc_time, '%b %e, %Y  %I:%M%p');
+      fmt = MG.time_format(args.utc_time, ctf[args.processed.x_time_frame] || '%b %e, %Y  %I:%M%p');
       break;
     case 'four-days':
-      fmt = MG.time_format(args.utc_time, '%b %e, %Y  %I:%M%p');
+      fmt = MG.time_format(args.utc_time, ctf[args.processed.x_time_frame] || '%b %e, %Y  %I:%M%p');
       break;
     default:
-      fmt = MG.time_format(args.utc_time, '%b %e, %Y');
+      fmt = MG.time_format(args.utc_time, ctf['default'] || '%b %e, %Y');
   }
   return fmt;
 }

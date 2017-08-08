@@ -276,22 +276,25 @@ function mg_years(diff) {
   return diff / (60 * 60 * 24) >= 365 * 2;
 }
 
-function mg_get_time_format(utc, diff) {
+function mg_get_time_format(utc, diff, time_format_x_axis) {
+  // custom time format
+  var ctf = time_format_x_axis || {};
+
   var main_time_format;
   if (mg_milisec_diff(diff)) {
-    main_time_format = MG.time_format(utc, '%M:%S.%L');
+    main_time_format = MG.time_format(utc, ctf['millisec'   ] || '%M:%S.%L');
   } else if (mg_sec_diff(diff)) {
-    main_time_format = MG.time_format(utc, '%M:%S');
+    main_time_format = MG.time_format(utc, ctf['sec'        ] || '%M:%S');
   } else if (mg_day_diff(diff)) {
-    main_time_format = MG.time_format(utc, '%H:%M');
+    main_time_format = MG.time_format(utc, ctf['day'        ] || '%H:%M');
   } else if (mg_four_days(diff)) {
-    main_time_format = MG.time_format(utc, '%H:%M');
+    main_time_format = MG.time_format(utc, ctf['four_days'  ] || '%H:%M');
   } else if (mg_many_days(diff)) {
-    main_time_format = MG.time_format(utc, '%b %d');
+    main_time_format = MG.time_format(utc, ctf['many_days'  ] || '%b %d');
   } else if (mg_many_months(diff)) {
-    main_time_format = MG.time_format(utc, '%b');
+    main_time_format = MG.time_format(utc, ctf['many_months'] || '%b');
   } else {
-    main_time_format = MG.time_format(utc, '%Y');
+    main_time_format = MG.time_format(utc, ctf['else'       ] || '%Y');
   }
   return main_time_format;
 }
@@ -304,7 +307,7 @@ function mg_process_time_format(args) {
   if (args.time_series) {
     diff = (args.processed.max_x - args.processed.min_x) / 1000;
     time_frame = mg_get_time_frame(diff);
-    main_time_format = mg_get_time_format(args.utc_time, diff);
+    main_time_format = mg_get_time_format(args.utc_time, diff, args.time_format_x_axis);
   }
 
   args.processed.main_x_time_format = main_time_format;
@@ -456,6 +459,9 @@ function mg_add_secondary_x_axis_label(args, g) {
 }
 
 function mg_get_yformat_and_secondary_time_function(args) {
+  // custom time format
+  var ctf = args.time_format_x_axis_secondary || {};
+
   var tf = {};
   tf.timeframe = args.processed.x_time_frame;
   switch (tf.timeframe) {
@@ -463,27 +469,27 @@ function mg_get_yformat_and_secondary_time_function(args) {
     case 'seconds':
       tf.secondary = d3.timeDays;
       if (args.european_clock) tf.yformat = MG.time_format(args.utc_time, '%b %d');
-      else tf.yformat = MG.time_format(args.utc_time, '%I %p');
+      else tf.yformat = MG.time_format(args.utc_time, ctf[tf.timeframe] || '%I %p');
       break;
     case 'less-than-a-day':
       tf.secondary = d3.timeDays;
-      tf.yformat = MG.time_format(args.utc_time, '%b %d');
+      tf.yformat = MG.time_format(args.utc_time, ctf[tf.timeframe] || '%b %d');
       break;
     case 'four-days':
       tf.secondary = d3.timeDays;
-      tf.yformat = MG.time_format(args.utc_time, '%b %d');
+      tf.yformat = MG.time_format(args.utc_time, ctf[tf.timeframe] || '%b %d');
       break;
     case 'many-days':
       tf.secondary = d3.timeYears;
-      tf.yformat = MG.time_format(args.utc_time, '%Y');
+      tf.yformat = MG.time_format(args.utc_time, ctf[tf.timeframe] || '%Y');
       break;
     case 'many-months':
       tf.secondary = d3.timeYears;
-      tf.yformat = MG.time_format(args.utc_time, '%Y');
+      tf.yformat = MG.time_format(args.utc_time, ctf[tf.timeframe] || '%Y');
       break;
     default:
       tf.secondary = d3.timeYears;
-      tf.yformat = MG.time_format(args.utc_time, '%Y');
+      tf.yformat = MG.time_format(args.utc_time, ctf['default'] || '%Y');
   }
   return tf;
 }
